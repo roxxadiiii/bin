@@ -1,1 +1,0 @@
-/home/roxx/.local/bin/pywal2alac.sh

@@ -1,1 +1,0 @@
-/home/roxx/.local/bin/polybar.sh
