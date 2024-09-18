@@ -18,7 +18,12 @@ else
     echo "Git not found. Installing Git..."
     sudo pacman -Syu --noconfirm git
 fi
-
+if command -v github-cli &> /dev/null; then
+    echo "Github is already installed."
+else
+    echo "Github not found. Installing Git..."
+    sudo pacman -Syu --noconfirm git
+fi
 # Configure Git
 echo "Configuring Git..."
 
@@ -38,5 +43,9 @@ git config --global core.editor nano
 echo "Enabling credential caching for Git..."
 git config --global credential.helper cache
 
+echo "Setting up Github-cli"
+gh auth login
+gh auth setup-git
+gh auth status
 
 echo "Git setup is complete."
