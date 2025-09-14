@@ -1,0 +1,3 @@
+#!/bin/bash
+# Searches repos + AUR (requires fzf)
+paru -Slq | fzf --multi --preview 'paru -Si {1}' | xargs -ro paru -S

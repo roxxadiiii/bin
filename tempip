@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Detect ethernet interface (first non-loopback wired interface)
+iface=$(ip -o link show | awk -F': ' '{print $2}' | grep -E "^e" | head -n 1)
+
+if [ -z "$iface" ]; then
+    echo "❌ No Ethernet interface detected!"
+    exit 1
+fi
+
+echo "✅ Detected Ethernet interface: $iface"
+
+# Ask user for details
+read -p "Enter IP Address (e.g., 192.168.1.100): " ip
+read -p "Enter Subnet Mask (e.g., 255.255.255.0): " sm
+read -p "Enter Default Gateway (e.g., 192.168.1.1): " gw
+
+# Convert Subnet Mask to CIDR
+mask2cidr() {
+  local x=${1##*/}
+  local nbits=0
+  IFS=.
+  for dec in $1; do
+      while [ $dec -gt 0 ]; do
+          nbits=$((nbits+dec%2))
+          dec=$((dec/2))
+      done
+  done
+  echo $nbits
+}
+
+cidr=$(mask2cidr $sm)
+
+# Flush old IP and set new one
+sudo ip addr flush dev "$iface"
+sudo ip addr add "$ip"/"$cidr" dev "$iface"
+sudo ip link set "$iface" up
+sudo ip route add default via "$gw"
+
+echo "✅ Temporary IP configuration applied!"
+ip addr show dev "$iface"
+ip route show
+

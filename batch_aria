@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import os
+import requests
+from bs4 import BeautifulSoup
+import subprocess
+from urllib.parse import urlparse
+
+art = (
+'''
+╔╗ ┌─┐┌┬┐┌─┐┬ ┬                      
+╠╩╗├─┤ │ │  ├─┤                      
+╚═╝┴ ┴ ┴ └─┘┴ ┴                      
+╔═╗┬─┐┬┌─┐                           
+╠═╣├┬┘│├─┤                           
+╩ ╩┴└─┴┴ ┴                           
+┌┐ ┬ ┬     ╦═╗╔═╗═╗ ╦═╗ ╦╔═╗╔╦╗╔═╗╦ ╦
+├┴┐└┬┘───  ╠╦╝║ ║╔╩╦╝╔╩╦╝╠═╣║║║╠═╣╚╦╝
+└─┘ ┴      ╩╚═╚═╝╩ ╚═╩ ╚═╩ ╩╩ ╩╩ ╩ ╩
+
+'''
+)
+
+# Function to get video links from a URL
+def get_video_links(url):
+    # Send HTTP request to the URL
+    response = requests.get(url)
+    
+    if response.status_code != 200:
+        print(f"Error fetching page: {response.status_code}")
+        return []
+
+    # Parse the page content
+    soup = BeautifulSoup(response.content, "html.parser")
+    
+    # Find all video tags or links (depends on the site structure)
+    video_links = []
+
+    # Look for <video> tags and <source> tags inside them (common structure for embedded videos)
+    for video in soup.find_all("video"):
+        for source in video.find_all("source"):
+            video_url = source.get("src")
+            if video_url:
+                video_links.append(video_url)
+    
+    # Look for direct video file links (e.g., .mp4, .avi, etc.)
+    for anchor in soup.find_all("a", href=True):
+        href = anchor["href"]
+        if href.lower().endswith(('.mp4', '.avi', '.mov', '.mkv', '.webm')):  # You can add more extensions
+            video_links.append(href)
+    
+    return video_links
+
+# Function to download videos using aria2c
+def download_videos(video_links, download_directory="Downloads"):
+    # Create download directory if it doesn't exist
+    os.makedirs(download_directory, exist_ok=True)
+    
+    for link in video_links:
+        # Extract the file name from the URL
+        filename = os.path.basename(urlparse(link).path)
+        filepath = os.path.join(download_directory, filename)
+
+        # Check if the file already exists
+        if os.path.exists(filepath):
+            print(f"File {filename} already exists. Skipping download.")
+        else:
+            print(f"Downloading: {filename}")
+            subprocess.run(["aria2c", "-d", download_directory, link])  # Calls aria2c to download the video
+            print(f"Downloaded: {filename}")
+
+# Main function to execute the script
+def main():
+    print(art)
+    url = input("Enter the URL of the website: ")
+    print("")
+    print(art)
+    print("Fetching video links...")
+    video_links = get_video_links(url)
+    print(art)
+    if not video_links:
+        print("No video links found.")
+        return
+    print(art)
+    print(f"Found {len(video_links)} video links. Downloading...")
+    download_videos(video_links)
+    print("Download complete.")
+
+if __name__ == "__main__":
+    main()
+
+

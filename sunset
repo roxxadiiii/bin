@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if pgrep -x "hyprsunset" > /dev/null; then
+    pkill hyprsunset
+    notify-send "Hyprsunset" "Disable - color back to normal"
+else
+    hyprsunset -t 4000 &
+    notify-send "Hyprsunset" "Enabled - warm screen"
+fi
+

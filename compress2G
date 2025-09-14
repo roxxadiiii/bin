@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Requirements: 7z, gum
+
+# Check dependencies
+if ! command -v 7z &> /dev/null; then
+    echo "7z not found! Please install p7zip."
+    exit 1
+fi
+
+if ! command -v gum &> /dev/null; then
+    echo "gum not found! Please install gum."
+    exit 1
+fi
+
+# Take directory argument
+DIR="$1"
+
+if [ -z "$DIR" ] || [ ! -d "$DIR" ]; then
+    echo "Usage: $0 <directory>"
+    exit 1
+fi
+
+# Default filename suggestion
+DEFAULT_NAME="$(basename "$DIR").7z"
+
+# Ask user to edit filename
+OUTFILE=$(gum input --value="$DEFAULT_NAME" --placeholder="Enter output filename")
+
+# If empty, fallback to default
+if [ -z "$OUTFILE" ]; then
+    OUTFILE="$DEFAULT_NAME"
+fi
+
+# Save to home directory
+OUTPUT_PATH="$HOME/$OUTFILE"
+
+# Confirm action
+gum confirm "Compress '$DIR' into '$OUTPUT_PATH' split into 2000MB chunks?" || exit 0
+
+# Run compression with splitting
+7z a -v2000m "$OUTPUT_PATH" "$DIR"
+
+# Completion message
+gum style --border double --margin "1" --padding "1 2" --border-foreground 212 "✅ Compression completed! Files saved at: $HOME"
+
+
+
