@@ -12,16 +12,16 @@ IMAGE="$1"
 notify-send "Changing Theme" "Applying new wallpaper and updating colors, please wait until confirmation..."
 
 # Set wallpaper
-swww img "$IMAGE" --transition-type="center" --transition-step=255 --transition-fps="60" --resize=fill
+www img "$IMAGE" --transition-type="random" --transition-step=255 --transition-fps="60" --resize=fit
 
 # Generate pywal colors
-wal -i "$IMAGE" -n -s -t -e
+#wal -i "$IMAGE" -n -s -t -e
 #wallust run "$IMAGE"
 # Refresh Spotify
 #pywal-spicetify Dribbblish
 
 # Use Matugen to generate Material You colors
-matugen image "$IMAGE"
+#matugen image "$IMAGE"
 
 # Refresh swaync
 pkill swaync

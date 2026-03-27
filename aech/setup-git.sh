@@ -33,3 +33,8 @@ gh(){
     sleep 5
     gh setup-git
 }
+
+install
+user
+configs
+gh
