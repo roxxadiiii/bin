@@ -19,3 +19,4 @@ install(){
     sudo pacman -S android-sdk-platform-tools
     sudo pacman -S android-tools
 }
+install
