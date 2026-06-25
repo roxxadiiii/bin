@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+packages=$(
+    pacman -Qq | \
+    fzf \
+        --multi \
+        --height=80% \
+        --border \
+        --prompt="Remove > " \
+        --preview='pacman -Qi {}'
+)
+
+[ -z "$packages" ] && exit 0
+
+echo
+echo "Packages to remove:"
+echo "$packages"
+echo
+
+read -rp "Remove with -Rns? [y/N] " confirm
+
+case "$confirm" in
+    [Yy]*)
+        paru -Rns $packages
+        ;;
+    *)
+        echo "Aborted."
+        ;;
+esac

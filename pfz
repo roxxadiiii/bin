@@ -1,0 +1,39 @@
+#!/bin/env bash
+
+
+# ascii art
+
+
+
+
+set -euo pipefail
+
+packages=$(
+    paru -Slq \
+    | sort -u \
+    | fzf \
+        --multi \
+        --height=80% \
+        --border \
+        --prompt="Install > " \
+        --preview='paru -Si {}'
+)
+
+[ -z "$packages" ] && exit 0
+
+echo
+echo "Selected packages:"
+echo "$packages"
+echo
+
+read -rp "Install? [Y/n] " confirm
+confirm=${confirm:-Y}
+
+case "$confirm" in
+    [Yy]*)
+        paru -S --needed $packages
+        ;;
+    *)
+        echo "Aborted."
+        ;;
+esac
