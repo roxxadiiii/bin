@@ -1,0 +1,2 @@
+#!/bin/bash
+exec node "${XDG_DATA_HOME:-$HOME/.local/share}/ryoku/zed-theme/scripts/theme.ts" --sync "$@"
